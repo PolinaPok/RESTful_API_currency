@@ -14,15 +14,7 @@ class CurrencyRepository:
             await session.commit()
             return new_row.id
 
-    @classmethod
-    async def get_currency(cls) -> list[Currencies]:
-        async with new_session() as session:
-            query = select(CurrenciesORM)  # .filter_by(date = user_date)
-            result = await session.execute(query)
-            currencies_models = result.scalars().all()
-            currencies = [Currencies.model_validate(currency_model) for currency_model in currencies_models]
-            return currencies_models
-
+    # Проверка, что за указанную дату уже имеются записи
     @classmethod
     async def check_currency(cls, user_date: str) -> bool:
         async with new_session() as session:
@@ -30,6 +22,7 @@ class CurrencyRepository:
             result = await session.execute(query)
             return bool(result.first())
 
+    # Получение списка всех кодов курса валют
     @classmethod
     async def get_currency_codes(cls) -> list:
         async with new_session() as session:
@@ -39,6 +32,7 @@ class CurrencyRepository:
             uniques_charcodes_list = [charcode for (charcode,) in uniques_charcodes]
             return uniques_charcodes_list
 
+    #Получение записей на одной странице
     @classmethod
     async def get_page(cls, page: int, per_page: int) -> list[CurrenciesSaved]:
         async with new_session() as session:
@@ -58,6 +52,7 @@ class CurrencyRepository:
             a = type(currencies_list)
             return currencies_list
 
+    #Получение количества записей в БД
     @classmethod
     async def get_row_count(cls) -> int:
         async with new_session() as session:
@@ -66,6 +61,7 @@ class CurrencyRepository:
             row_count = result.scalar_one()
             return row_count
 
+    # Удаление записей по коду курса валют
     @classmethod
     async def delete_by_charcode(cls, currency_code: str):
         async with new_session() as session:

@@ -50,7 +50,6 @@ async def load_currencies(date: str):
         if response.status_code != 200:
             HTTPException(status_code=502, detail="Ошибка при получении данных от ЦБ РФ")
 
-        # result = []
         root = ET.fromstring(response.content)
         for valute in root.findall('Valute'):
             date = date
@@ -83,10 +82,13 @@ async def unique_currency_codes(page: int = 1, per_page: int = 10):
 
     Укажите номер страницы и количество элементов на странице, не превышающее 100."""
     max_per_page = 100
+    #Проверка, что не превышено 100 элементов на странице
     if per_page > max_per_page:
         raise HTTPException(status_code=400, detail="Количество элементов на странице не должно превышать 100")
     else:
+        #Получаем записи страницы
         query_result = await CurrencyRepository.get_page(page, per_page)
+        #Получаем общее число строк в БД
         row_count = await CurrencyRepository.get_row_count()
         responce = {'page': page, per_page: per_page, 'total': row_count, 'items': [query_result]}
         return responce
@@ -98,6 +100,7 @@ async def delete_by_code(currency_code: str):
 
     Укажите код валюты латинскими бувами (пример, RON)."""
     currency_code = currency_code.upper()
+    #Проверка соответствия формату
     cond = re.match(r"^[a-zA-Z]{3}$", currency_code)
     if not cond:
         raise HTTPException(status_code=400, detail="Неверный формат кода валюты")
