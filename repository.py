@@ -29,10 +29,11 @@ class CurrencyRepository:
             query = select(CurrenciesORM.charcode.distinct())
             result = await session.execute(query)
             uniques_charcodes = result.all()
-            uniques_charcodes_list = [charcode for (charcode,) in uniques_charcodes]
+            uniques_charcodes_list = [
+                charcode for (charcode,) in uniques_charcodes]
             return uniques_charcodes_list
 
-    #Получение записей на одной странице
+    # Получение записей на одной странице
     @classmethod
     async def get_page(cls, page: int, per_page: int) -> list[CurrenciesSaved]:
         async with new_session() as session:
@@ -48,11 +49,12 @@ class CurrencyRepository:
 
             result = await session.execute(query)
             currencies_models = result.scalars().all()
-            currencies_list = [CurrenciesSaved.model_validate(currency_model) for currency_model in currencies_models]
+            currencies_list = [CurrenciesSaved.model_validate(
+                currency_model) for currency_model in currencies_models]
             a = type(currencies_list)
             return currencies_list
 
-    #Получение количества записей в БД
+    # Получение количества записей в БД
     @classmethod
     async def get_row_count(cls) -> int:
         async with new_session() as session:
@@ -65,7 +67,8 @@ class CurrencyRepository:
     @classmethod
     async def delete_by_charcode(cls, currency_code: str):
         async with new_session() as session:
-            statement = delete(CurrenciesORM).where(CurrenciesORM.charcode == currency_code)
+            statement = delete(CurrenciesORM).where(
+                CurrenciesORM.charcode == currency_code)
             await session.execute(statement)
             await session.commit()
             return
